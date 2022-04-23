@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+  <template root="1">
+    <title>トップページ</title>
+    <sourcecode><![CDATA[{% extends "master.tpl" %}
+
+{% block main %}
+  {% set entries = apps.recent(10) %}
+  {% for entry in entries %}
+  <article>
+    <h1><a href="{{ entry.relative }}">{{ entry.title }}</a></h1>
+    {{ entry.body|markdown }}
+    <p class="meta">作成:{{ entry.create_date|date('Y-m-d H:i') }}&nbsp;&nbsp;更新:{{ entry.modify_date|date('Y-m-d H:i') }}</p>
+    {% if not loop.last %}<hr>{% endif %}
+  </article>
+  {% endfor %}
+{% endblock %}]]>
+    </sourcecode>
+    <kind>1</kind>
+    <path>homepage</path>
+    <active>1</active>
+  </template>
+  <template>
+    <title>エントリ・汎用テンプレート</title>
+    <sourcecode><![CDATA[{% extends 'master.tpl' %}
+
+{% block main %}
+{% import _self as self %}
+{% import 'attachments.tpl' as macro1 %}
+{% import 'sections.tpl' as macro2 %}
+<article>
+  <h1>{{ current.title }}</h1>
+  <div class="detail">
+    {{ current.body|markdown }}
+    {{ macro1.attachments(apps.attachments(current.id)) }}
+  </div>
+  {{ macro2.sectionblock(current.identifier, null) }}
+</article>
+{% endblock %}]]>
+    </sourcecode>
+    <kind>2</kind>
+    <path>entry</path>
+    <active>1</active>
+  </template>
+  <template>
+    <title>アーカイブ・汎用テンプレート</title>
+    <sourcecode><![CDATA[{% extends 'master.tpl' %}
+
+{% block main %}
+  {% set entries = apps.entries(current.id) %}
+  {% for entry in entries %}
+    <article>
+      <h1><a href="{{ entry.relative }}">{{ entry.title }}</a></h1>
+      {{ entry.body|markdown }}
+      <p class="meta">作成:{{ entry.create_date|date('Y-m-d H:i') }}&nbsp;&nbsp;更新:{{ entry.modify_date|date('Y-m-d H:i') }}</p>
+      {% if not loop.last %}<hr>{% endif %}
+    </article>
+  {% endfor %}
+{% endblock %}]]>
+    </sourcecode>
+    <kind>3</kind>
+    <path>archive</path>
+    <active>1</active>
+  </template>
+  <template>
+    <title>マスター・テンプレート</title>
+    <sourcecode><![CDATA[<!DOCTYPE html>
+<html lang="ja" class="{{ html_class }}" id="{{ html_id }}">
+  <meta charset="UTF-8">
+  {% if current.description is not empty %}
+    <meta name="description" content="{{ current.description }}">
+  {% endif %}
+  {% if current.tags is not empty %}
+    <meta name="keywords" content="{{ current.tags }}">
+  {% endif %}
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0">
+  <meta name="format-detection" content="telephone=no">
+  <title>{{ site.title }} - {{ current.title }}</title>
+  {% set styles = apps.styleSheets() %}
+  {% for style in styles %}
+    <link rel="stylesheet" href="{{ site.path }}{{ style }}">
+  {% else %}
+    <!-- NONE STYLE -->
+  {% endfor %}
+  <div class="container">
+    <header>
+      <p><a href="{{ site.path }}">{{ site.title }}</a></p>
+    </header>
+    <div class="breadcrumbs">
+      {% set breadcrumbs = apps.breadcrumbs(current.id,1) %}
+      {% if current.id != apps.site_root %}
+        <a href="{{ site.path }}{{ backhome }}">HOME</a>
+      {% else %}
+        <span>HOME</span>
+      {% endif %}
+      {% for crumb in breadcrumbs %}
+        {% if loop.last %}
+          <span class="separator">|</span>
+          <b>{{ crumb.title }}</b>
+        {% else %}
+          <span class="separator">|</span>
+          {% if crumb.url is not empty %}
+            <a href="{{ crumb.relative }}">{{ crumb.title }}</a>
+          {% else %}
+            <span>{{ crumb.title }}</span>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="row">
+      <main>
+        {% if config.application.guest != 'allow' and session.uname == 'guest' %}
+          {% include 'signin.tpl' %}
+        {% else %}
+          {% block main %}{% endblock %}
+        {% endif %}
+      </main>
+      <nav id="global-nav">
+        {% import "global-nav.tpl" as navi %}
+        {{ navi.recursion(apps.site_root) }}
+        {% if build_type == 'archive' and current.archive_format is not empty %}
+          {% set years = apps.archivesByYear(current.id, current.archive_format) %}
+          {% for unit in years %}
+            {% if loop.first %}
+              <ul>
+            {% endif %}
+            <li><a href="{{ unit.url }}">{{ unit.year }}</a></li>
+            {% if loop.last %}
+              </ul>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </nav>
+    </div>
+    <footer>
+      <p>Powered by G.Snowhawk</p>
+    </footer>
+  </div>]]>
+    </sourcecode>
+    <kind>5</kind>
+    <path>master</path>
+    <active>1</active>
+  </template>
+  <template>
+    <title>ナビゲーション</title>
+    <sourcecode><![CDATA[{% macro recursion(i) %}
+  {% import _self as self %}
+  {% set category = apps.childCategories(i) %}
+  {% for item in category %}
+    {% if loop.first %}
+      <ul>
+    {% endif %}
+    <li>{% if item.template is not empty %}<a href="{{ item.relative }}">{{ item.title }}</a>{% else %}{{ item.title }}{% endif %}
+    {% if item.id is not null %}
+      {{ self.recursion(item.id) }}
+    {% endif %}
+    </li>
+    {% if loop.last %}
+      </ul>
+    {% endif %}
+  {% endfor %}
+{% endmacro %}]]>
+    </sourcecode>
+    <kind>5</kind>
+    <path>global-nav</path>
+    <active>1</active>
+  </template>
+  <template>
+    <title>添付ファイル</title>
+    <sourcecode><![CDATA[{% macro attachments(files) %}
+  {% for file in files %}
+    {% if loop.first %}
+      <div class="attachments">
+        <ul>
+    {% endif %}
+    {% if 'image/' in file.mime %}
+      <li class="image"><img src="{{ file.path }}" alt="{{ file.alternate }}">
+    {% else %}
+      <li class="file">
+        <a href="{{ file.path }}" target="_blank">{{ file.alternate }}</a>
+    {% endif %}
+    {% if file.note is not empty %}
+      <div class="caption">{{ file.note|nl2br }}</div>
+    {% endif %}
+    </li>
+    {% if loop.last %}
+        </ul>
+      </div>
+    {% endif %}
+  {% endfor %}
+{% endmacro %}]]>
+    </sourcecode>
+    <kind>5</kind>
+    <path>attachments</path>
+    <active>1</active>
+  </template>
+  <template>
+    <title>セクション</title>
+    <sourcecode><![CDATA[{% macro sectionblock(eid, i) %}
+  {% import 'attachments.tpl' as macro1 %}
+  {% import _self as macro2 %}
+  {% set sections = apps.sections(eid,i) %}
+  {% for item in sections %}
+    <section>
+      <h{{ item.level }}>{{ item.title }}</h{{ item.level }}>
+      <div class="detail">
+        {{ item.body|markdown }}
+        {{ macro1.attachments(apps.attachments(item.id,'section')) }}
+      </div>
+      {% if item.id is not empty %}
+        {{ macro2.sectionblock(eid,item.id) }}
+      {% endif %}
+    </section>
+  {% endfor %}
+{% endmacro %}]]>
+    </sourcecode>
+    <kind>5</kind>
+    <path>sections</path>
+    <active>1</active>
+  </template>
+  <template>
+    <title>ログインパネル</title>
+    <sourcecode><![CDATA[<form id="TMS-mainform" action="{{ form.action }}" method="{{ form.method }}" enctype="{{ form.enctype }}">
+  <input type="hidden" name="stub" value="{{ stub }}">
+  <div class="input">
+    <input type="text" name="uname" id="uname" placeholder="ユーザー名" value="{{ post.uname }}">
+  </div>
+  <div class="input">
+    <input type="password" name="upass" id="upass" placeholder="パスワード" autocomplete="off">
+  </div>
+  <div class="form-footer">
+    <input type="submit" name="authEnabler" value="ログイン">
+  </div>
+</form>]]>
+    </sourcecode>
+    <kind>5</kind>
+    <path>signin</path>
+    <active>1</active>
+  </template>
+  <template>
+    <title>デフォルト・スタイルシート</title>
+    <sourcecode><![CDATA[@charset "UTF-8";
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+}
+a {
+  color: #369;
+  text-decoration: none;
+}
+
+header {
+  border-bottom: 1px solid #ccc;
+}
+header p {
+  margin: 1rem;
+}
+header p a {
+  font-size: 1.5rem;
+}
+
+.breadcrumbs {
+  box-sizing: border-box;
+  font-size: .8rem;
+  margin: auto;
+  max-width: 1024px;
+  padding: 1em;
+}
+.breadcrumbs span.separator {
+  font-style: italic;
+  margin: auto .25rem;
+}
+
+.row {
+  display: flex;
+  flex-direction: row-reverse;
+  margin: 0 auto;
+  max-width: 1024px;
+}
+.row > nav {
+  min-width: 256px;
+}
+.row > main {
+  flex-grow: 1;
+}
+
+footer {
+  margin: 3rem auto;
+}
+footer p {
+  color: #999;
+  font-size: .7rem;
+  text-align: center;
+}
+
+#global-nav li {
+  font-size: .9rem;
+}
+
+main {
+  display: block;
+}
+
+article p.meta {
+  color: #999;
+  font-size: .75rem;
+}
+article hr {
+  border: 0 none transparent;
+  border-top: 1px solid #ccc;
+  height: 0;
+}
+
+.attachments ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+.attachments li {
+  margin: 1em auto;
+}
+.attachments img {
+  max-width: 100%;
+}]]>
+    </sourcecode>
+    <kind>6</kind>
+    <path>default</path>
+    <active>1</active>
+  </template>
+</templates>
