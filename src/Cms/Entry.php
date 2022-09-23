@@ -494,7 +494,8 @@ class Entry extends Category
 
         if ($entrykey === self::PREVIEW_FILES_DIR) {
             $this->session->clear('preview_attachments');
-            if (File::rmdir("{$upload_dir}/" . self::previewTemporaryDir(), true)) {
+            $preview_temporary_dir = "{$upload_dir}/" . self::previewTemporaryDir();
+            if (!file_exists($preview_temporary_dir) || File::rmdir($preview_temporary_dir, true)) {
                 return $this->removeEmptyDir($upload_dir);
             }
         }

@@ -884,7 +884,10 @@ class Site extends \Gsnowhawk\Cms
                 continue;
             }
             if (!in_array($dir, $sites)) {
-                File::rmdir("{$mirror}/$dir", true);
+                $path = "{$mirror}/{$dir}";
+                if (is_dir($path)) {
+                    File::rmdir($path, true);
+                }
             }
         }
     }

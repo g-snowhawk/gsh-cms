@@ -52,7 +52,7 @@ class Response extends \Gsnowhawk\Cms\Template
             [$this->siteID, 0]
         );
 
-        $dir = @realpath($this->app->cnf('application:cms_global_templates'));
+        $dir = @realpath($this->app->cnf('application:cms_global_templates') ?? '');
         foreach ($templates as &$unit) {
             $unit['status'] = self::status($unit['id'], $unit['modify_date'], $dir);
         }
