@@ -706,7 +706,9 @@ class Category extends Template
             foreach ($arr_archives_name as $file_name) {
 
                 // if find same name in entries
-                if ($category['id'] !== $this->site_data['rootcategory'] && method_exists($this, 'build')) {
+                if (strval($category['id']) !== strval($this->site_data['rootcategory'])
+                    && method_exists($this, 'build')
+                ) {
                     $eid = $this->db->get('id', 'entry', 'category = ? AND filepath = ? AND active = 1', [$category['id'], $release_file]);
                     if (!empty($eid)) {
                         if ($eid === $entry_id) {
