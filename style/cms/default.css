@@ -1,0 +1,338 @@
+
+/**
+ * Only for site page
+ */
+.site .wrapper section {
+  border-bottom: 1px dashed #999;
+  margin: 40px auto;
+  padding: 0 16px;
+}
+.site .wrapper section h2 {
+  font-size: 1.2rem;
+  font-weight: 200;
+  line-height: 1.2;
+  margin: 0;
+}
+.site .wrapper .current {
+  border-color: #69c;
+}
+.site .wrapper .current h2:before {
+  color: #69c;
+  content: '★';
+}
+.site .wrapper section p {
+  color: #999;
+  font-size: .7rem;
+  line-height: 1.2;
+  margin: 0;
+}
+.site .wrapper section.nodata p {
+  font-size: 0.8rem;
+  margin: 0.5em auto 1em;
+}
+.site .wrapper .item-footer {
+  align-items: flex-end;
+  display: flex;
+  justify-content: space-between;
+}
+.site .wrapper .item-footer .runlevel {
+  font-size: 0.72rem;
+  margin: 8px 0;
+}
+.site .wrapper .item-footer .runlevel:before {
+  color: #ccc;
+  content: '●';
+  margin: 0 0.2em 0 0;
+}
+.site .wrapper .item-footer .runlevel.normal:before {
+  color: #0c0;
+}
+.site .wrapper .item-footer .runlevel.maintenance:before {
+  color: #fc0;
+}
+.site .wrapper .item-footer .runlevel.emergency:before {
+  color: #f00;
+}
+.site .wrapper .controls {
+  font-size: 0;
+  margin: 8px 0;
+  text-align: right;
+}
+.site .wrapper .controls label,
+.site .wrapper .controls a {
+  color: #666;
+  border: 1px solid #ccc;
+  display: inline-block;
+  font-size: .8rem;
+  line-height: 24px;
+  margin: 0 0 0 4px;
+  min-width: 60px;
+  padding: 0px 12px;
+  text-align: center;
+  text-decoration: none;
+}
+.site .wrapper .current .controls label,
+.site .wrapper .controls label:hover,
+.site .wrapper .controls a:hover {
+  background: #69c;
+  border-color: #69c;
+  color: #fff;
+}
+.site .wrapper .controls label input[type="radio"] {
+  display: none;
+}
+
+#cms-site-default .wrapper .footer-controls {
+  align-items: center;
+  display: flex;
+  margin-bottom: 1rem;
+  margin-top: -24px;
+}
+#cms-site-default .wrapper .footer-controls .function-key {
+  margin: 0;
+}
+#cms-site-default .wrapper .footer-controls .function-key a {
+  vertical-align: top;
+}
+#cms-site-default .wrapper .footer-controls .pagination {
+  margin-left: auto;
+}
+#cms-site-default .wrapper .footer-controls .pagination .pager {
+  margin-right: 0;
+}
+#cms-site-default .wrapper .footer-controls .pagination b,
+#cms-site-default .wrapper .footer-controls .pagination a {
+  background-color: rgba(0,0,0,0.1);
+  box-sizing: border-box;
+  color: #333;
+  line-height: 24px !important;
+  margin: 0 1px 0 0;
+  min-width: 24px;
+  padding: 0 4px !important;
+  text-align: center;
+  text-decoration: none;
+}
+#cms-site-default .wrapper .footer-controls .pagination a:hover {
+  background-color: rgba(0,0,0,0.6);
+  color: #fff;
+}
+#cms-site-default .wrapper .footer-controls .pagination a.prev,
+#cms-site-default .wrapper .footer-controls .pagination a.next {
+  background-color: transparent;
+}
+#cms-site-default .wrapper .footer-controls .pagination a.prev:hover,
+#cms-site-default .wrapper .footer-controls .pagination a.next:hover {
+  color: #69c;
+}
+#cms-site-default .wrapper .footer-controls .pagination b {
+  background-color: #69c;
+  color: #fff;
+}
+#cms-site-default .wrapper .footer-controls .pagination span {
+  color: #ccc;
+}
+#cms-site-default .wrapper .footer-controls .pagination + select {
+  border-radius: 0;
+  color: #333;
+  font-size: 0.8rem;
+  margin-left: 0.5em;
+  padding: 4px 6px;
+}
+
+#cms-site-edit textarea[name="announce"] {
+  font-family: Courier, 'Courier New', monospace;
+  min-height: 12em;
+}
+
+html.entry .explorer .tree p a:before,
+html.entry .explorer .tree li a:before {
+  content: '\30FB';
+}
+html.entry .explorer .tree li a.with-icon.trash {
+  margin-top: 0.5em;
+}
+html.entry .explorer .tree li a.with-icon.trash:before {
+  content: '\1F5D1';
+  margin-right: 0.2em;
+}
+html.entry-edit #body {
+  -khtml-user-drag: element;
+  height: 300px;
+}
+html.entry-edit #description {
+  height: 5rem;
+}
+html.entry-edit #section-list li > div.line {
+  position: relative;
+}
+html.entry-edit #section-list li > div.line.with-icon a {
+  background: transparent none no-repeat 8px 50%;
+  background-size: 20px 20px;
+  padding-left: 34px;
+}
+html.entry-edit #section-list li > div.line.with-icon.draft a {
+  background-image: url(../icon_draft.svg);
+}
+html.entry-edit #section-list li > div.line.with-icon.draft.new a {
+  background-image: url(../icon_draft_new.svg);
+}
+html.entry-edit #section-list li > div.line.with-icon.private a {
+  background-image: url(../icon_private.svg);
+}
+html.entry-edit #section-list li > div.line.with-icon.release a {
+  background-image: url(../icon_world.svg);
+}
+html.entry-edit #previewScreen {
+  background-color: #fff;
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 25px;
+  z-index: 89;
+}
+html.entry-edit #previewScreen iframe {
+  border: 0 none;
+  height: 100%;
+  vertical-align: top;
+  width: 100%;
+}
+html.entry-edit #previewControler {
+  bottom: 0;
+  left: 0;
+  padding: 8px;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  z-index: 90;
+}
+html.entry-edit #previewControler input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
+  background-color: rgba(0,0,0,.5);
+  border: 1px solid rgba(255,255,255,0.7);
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: #fff;
+  font-size: .9rem;
+  line-height: 28px;
+  margin: 4px 2px;
+  min-width: 120px;
+  padding: 0px 12px;
+  transition: background-color .5s ease;
+}
+html.entry-edit #previewControler input:focus,
+html.entry-edit #previewControler input:hover {
+  background-color: rgba(0,0,0,0.8);
+  border: 1px solid rgba(255,255,255,1);
+}
+html.entry input.hidden,
+html.entry #progress-rebuilding.hidden {
+  display: none;
+}
+
+#section-edit #body {
+  -khtml-user-drag: element;
+  height: 300px;
+}
+
+#cms-category-edit #author_date {
+  margin: 0;
+  padding: 2px;
+}
+
+/**
+ * Only for template edit
+ */
+#cms-template-edit #sourcecode {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: .8rem;
+  height: 400px;
+}
+#cms-template-default .explorer-list table tbody td.link sup {
+  color: #c00;
+  font-size: 1em;
+  line-height: 1;
+  margin: auto 2px;
+  vertical-align: text-top;
+}
+
+
+html.announce,
+html.announce body {
+  height: 100%;
+  margin: 0;
+  overflow: auto;
+}
+html.announce #container {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 100%;
+}
+
+
+#file-uploader .with-thumbnail {
+  -webkit-filter: grayscale(100%);
+  filter: grayscale(100%);
+  opacity: 0.1;
+}
+#file-uploader .with-thumbnail.active {
+  -webkit-filter: grayscale(0);
+  filter: grayscale(0);
+  opacity: 1;
+}
+
+html.filemanager .explorer-list table tbody td.url a {
+  color: inherit;
+  font-family: Courier, 'Courier New', monospace;
+  font-size: 0.8rem;
+  text-decoration: none;
+}
+html.filemanager .explorer-list .footer-controls {
+  position: relative;
+}
+html.filemanager .explorer-list .footer-controls #file-selector {
+  background-color: rgba(255,255,255,0.85);
+  bottom: 100%;
+  height: 0;
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  right: 0;
+  transition: height 0.5s ease;
+  z-index: 100;
+}
+html.filemanager .explorer-list .footer-controls #file-selector.open {
+  height: 320px;
+}
+html.filemanager .explorer-list .footer-controls #file-selector label {
+  align-items: center;
+  border: 1px dashed #ccc;
+  bottom: 8px;
+  display: flex;
+  justify-content: center;
+  left: 8px;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  right: 8px;
+  text-align: center;
+  top: 8px;
+}
+html.filemanager .explorer-list .footer-controls #file-selector label span {
+  color: rgba(0,0,0,0);
+  transition: color 0.5s ease;
+}
+html.filemanager .explorer-list .footer-controls #file-selector.open label span {
+  color: rgba(0,0,0,0.5);
+}
+html.filemanager .explorer-list .footer-controls #file-selector label.dragover span {
+  color: rgba(255,0,0,0.6);
+}
+html.filemanager .explorer-list .footer-controls #file-selector label input {
+  display: none;
+}

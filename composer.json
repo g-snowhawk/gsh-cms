@@ -1,0 +1,29 @@
+{
+    "name": "g-snowhawk/gsh-cms",
+    "type": "library",
+    "description": "This package is content management system.",
+    "license": "MIT",
+    "repositories": [
+        {
+            "name": "g-snowhawk/gsh-core",
+            "type": "vcs",
+            "url": "https://github.com/g-snowhawk/gsh-core.git"
+        }
+    ],
+    "require": {
+        "php": ">=7.4.0",
+        "g-snowhawk/gsh-core": "1.0.*"
+    },
+    "author": {
+        "name": "Taka G",
+        "homepage": "https://www.p5on.net"
+    },
+    "autoload": {
+        "psr-4": {
+            "Gsnowhawk\\Cms\\" : "src/Cms/"
+        },
+        "classmap": [
+            "src/Cms/Cms.php"
+        ]
+    }
+}
