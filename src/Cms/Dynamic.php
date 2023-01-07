@@ -33,7 +33,7 @@ class Dynamic extends Section
     public function __construct()
     {
         $params = func_get_args();
-        call_user_func_array('parent::__construct', $params);
+        call_user_func_array(parent::class.'::__construct', $params);
 
         $this->uri = Http::getURI();
         $this->view->bind('isfrontend', 1);

@@ -43,7 +43,7 @@ class Entry extends Category
     public function __construct()
     {
         $params = func_get_args();
-        call_user_func_array('parent::__construct', $params);
+        call_user_func_array(parent::class.'::__construct', $params);
     }
 
     /**
@@ -1158,11 +1158,14 @@ class Entry extends Category
         }
         $this->view->bind('page_number', $pagenumber);
 
+        // Bind html class to view instance
         $html_class = [str_replace('_', '-', $template['path'])];
         if (!empty($sub_class)) {
             $html_class[] = $sub_class;
         }
         $this->appendHtmlClass($html_class);
+
+        // Bind html ID to view instance
         $html_id = $this->pathToID($entry['url']);
         if (empty($html_id)) {
             $html_id = $html_class;

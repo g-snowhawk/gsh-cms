@@ -74,7 +74,7 @@ class Category extends Template
     public function __construct()
     {
         $params = func_get_args();
-        call_user_func_array('parent::__construct', $params);
+        call_user_func_array(parent::class.'::__construct', $params);
 
         $this->category_data = $this->db->get('*', 'category', 'id = ?', [$this->categoryID]);
     }
@@ -486,8 +486,8 @@ class Category extends Template
         $midparent = '(SELECT * FROM table::category WHERE sitekey = :site_id)';
         $children = $this->categoryListSQL();
 
-        $sort = " ORDER BY ${order_by}";
-        $list = $this->db->nsmGetChildren($columns, $parent, $midparent, $children, "AND children.id IS NOT NULL$sort", ['site_id' => $this->siteID, 'category_id' => $id]);
+        $sort = " ORDER BY {$order_by}";
+        $list = $this->db->nsmGetChildren($columns, $parent, $midparent, $children, "AND children.id IS NOT NULL{$sort}", ['site_id' => $this->siteID, 'category_id' => $id]);
 
         if (false === $list) {
             trigger_error($this->db->error());
