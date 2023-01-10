@@ -635,7 +635,11 @@ class Category extends Template
         $this->setHtmlId($html_id);
 
         $sub_class = $this->pathToID($category['path']);
-        $this->appendHtmlClass([$html_class, $sub_class]);
+        if ($this->request->param('in_reassemble') === '1') {
+            $this->setHtmlClass([$html_class, $sub_class]);
+        } else {
+            $this->appendHtmlClass([$html_class, $sub_class]);
+        }
 
         $path = $this->templatePath($category['template']);
         $this->setPathToView(dirname($path));
