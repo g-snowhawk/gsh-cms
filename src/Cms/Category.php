@@ -1539,19 +1539,16 @@ class Category extends Template
             return false;
         }
 
+        $args = func_get_args();
         $all = false;
         try {
-            $category_id = func_get_arg(0);
+            $category_id = $args[0];
         } catch (ErrorException $e) {
             $category_id = self::rootCategory();
             $all = true;
         }
 
-        try {
-            $single = func_get_arg(1);
-        } catch (ErrorException $e) {
-            $single = false;
-        }
+        $single = $args[1] ?? false;
 
         if (false === $single) {
             $range = $this->db->get('lft,rgt', 'category', 'id = ?', [$category_id]);
