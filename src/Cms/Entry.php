@@ -1622,7 +1622,7 @@ class Entry extends Category
                         $update_flag = true;
                         $save['sort'] = $save_data['sort'];
                     }
-                    if ($old['note'] !== $save_data['note']) {
+                    if ($old['note'] !== ($save_data['note'] ?? null)) {
                         $update_flag = true;
                         $save['note'] = $save_data['note'];
                     }
