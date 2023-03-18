@@ -214,7 +214,6 @@ class Site extends \Gsnowhawk\Cms
                         $result += $plugin_result;
                     }
                 }
-                // ^ write here.
             } else {
                 $result = false;
             }

@@ -259,7 +259,6 @@ class Section extends Entry
             && false !== $this->db->nsmCleanup('section', 'WHERE sitekey = ? and entrykey = ? and revision = ?', [$sitekey, $entrykey, '0'])
             && false !== $this->db->delete('section', 'identifier = ?', [$sectionkey])
         ) {
-
             // Rebuild entry file
             if ($rebuild === 'immediately' && !empty($entrykey)) {
                 $this->createEntryFile($entrykey);

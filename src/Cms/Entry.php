@@ -1607,72 +1607,72 @@ class Entry extends Category
         $upload_dir = dirname($upload_path);
 
         switch ($context['error']) {
-        case UPLOAD_ERR_NO_FILE:
-            if (is_null($delete) || empty($id)) {
-                if (!empty($id) && $this->session->param('ispreview') === 1) {
-                    $save_data['id'] = $id;
-                    self::setPreviewAttachments($save_data);
-                }
-
-                $old = $this->db->get('mime,alternate,data,note,option1,sort', 'custom', 'sitekey = ? AND id = ?', [$this->siteID, $id]);
-                if (!empty($old)) {
-                    $update_flag = false;
-                    $save = [];
-                    if ($old['sort'] !== $save_data['sort']) {
-                        $update_flag = true;
-                        $save['sort'] = $save_data['sort'];
-                    }
-                    if ($old['note'] !== ($save_data['note'] ?? null)) {
-                        $update_flag = true;
-                        $save['note'] = $save_data['note'];
-                    }
-                    if ($old['alternate'] !== ($save_data['alternate'] ?? null)) {
-                        $update_flag = true;
-                        $save['alternate'] = $save_data['alternate'] ?? null;
-                    }
-                    if ($old['option1'] !== ($save_data['option1'] ?? null)) {
-                        $update_flag = true;
-                        $save['option1'] = $save_data['option1'] ?? null;
-                    }
-                    if (!empty($save_data['mime']) && $old['mime'] !== ($save_data['mime'] ?? null)) {
-                        $update_flag = true;
-                        $save['mime'] = $save_data['mime'];
+            case UPLOAD_ERR_NO_FILE:
+                if (is_null($delete) || empty($id)) {
+                    if (!empty($id) && $this->session->param('ispreview') === 1) {
+                        $save_data['id'] = $id;
+                        self::setPreviewAttachments($save_data);
                     }
 
-                    if (($save['mime'] ?? $old['mime']) === 'application/pdf') {
-                        $file_path = $upload_dir.'/'.basename($old['data']);
-                        if (($save['option1'] ?? null) === 'none') {
-                            self::clearPDFThumbnail($file_path);
-                        } else {
-                            self::createPDFThumbnail($this->command_convert, $id, $file_path, $save['option1'] ?? $old['option1']);
+                    $old = $this->db->get('mime,alternate,data,note,option1,sort', 'custom', 'sitekey = ? AND id = ?', [$this->siteID, $id]);
+                    if (!empty($old)) {
+                        $update_flag = false;
+                        $save = [];
+                        if ($old['sort'] !== $save_data['sort']) {
+                            $update_flag = true;
+                            $save['sort'] = $save_data['sort'];
+                        }
+                        if ($old['note'] !== ($save_data['note'] ?? null)) {
+                            $update_flag = true;
+                            $save['note'] = $save_data['note'];
+                        }
+                        if ($old['alternate'] !== ($save_data['alternate'] ?? null)) {
+                            $update_flag = true;
+                            $save['alternate'] = $save_data['alternate'] ?? null;
+                        }
+                        if ($old['option1'] !== ($save_data['option1'] ?? null)) {
+                            $update_flag = true;
+                            $save['option1'] = $save_data['option1'] ?? null;
+                        }
+                        if (!empty($save_data['mime']) && $old['mime'] !== ($save_data['mime'] ?? null)) {
+                            $update_flag = true;
+                            $save['mime'] = $save_data['mime'];
+                        }
+
+                        if (($save['mime'] ?? $old['mime']) === 'application/pdf') {
+                            $file_path = $upload_dir.'/'.basename($old['data']);
+                            if (($save['option1'] ?? null) === 'none') {
+                                self::clearPDFThumbnail($file_path);
+                            } else {
+                                self::createPDFThumbnail($this->command_convert, $id, $file_path, $save['option1'] ?? $old['option1']);
+                            }
+                        }
+
+                        if ($update_flag && $this->session->param('ispreview') !== 1) {
+                            if (false === $ret = $this->db->update('custom', $save, 'sitekey = ? AND id = ?', [$this->siteID, $id], [])) {
+                                trigger_error($this->db->error());
+
+                                return false;
+                            }
+
+                            return $ret;
                         }
                     }
 
-                    if ($update_flag && $this->session->param('ispreview') !== 1) {
-                        if (false === $ret = $this->db->update('custom', $save, 'sitekey = ? AND id = ?', [$this->siteID, $id], [])) {
-                            trigger_error($this->db->error());
-
-                            return false;
-                        }
-
-                        return $ret;
-                    }
+                    return 0;
                 }
+                // no break
+            case UPLOAD_ERR_OK:
+                break;
+            case UPLOAD_ERR_INI_SIZE:
+            case UPLOAD_ERR_FORM_SIZE:
+                $error = 'File size is too large';
 
-                return 0;
-            }
-            // no break
-        case UPLOAD_ERR_OK:
-            break;
-        case UPLOAD_ERR_INI_SIZE:
-        case UPLOAD_ERR_FORM_SIZE:
-            $error = 'File size is too large';
+                return false;
+            default:
+                $error = 'File upload failed';
 
-            return false;
-        default:
-            $error = 'File upload failed';
-
-            return false;
+                return false;
         }
 
         $old = $this->db->get('mime,alternate,data,note,option1', 'custom', 'sitekey = ? AND id = ?', [$this->siteID, $id]);
@@ -1753,7 +1753,6 @@ class Entry extends Category
 
                     return false;
                 }
-                //$save_data['id'] = $id;
             } else {
                 if (false === $ret = $this->db->insert('custom', $save_data, [])) {
                     trigger_error($this->db->error());
@@ -1779,7 +1778,6 @@ class Entry extends Category
             mkdir($directory, 0777, true);
         }
         if (move_uploaded_file($context['tmp_name'], $upload_path)) {
-
             // Create PDF thumbnail
             $option1 = $save_data['option1'] ?? null;
             if (strtolower($save_data['mime']) === 'application/pdf' && (!empty($option1) || $option1 === '0')) {

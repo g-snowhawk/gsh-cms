@@ -196,7 +196,6 @@ class Category extends Template
                         $result = rename($old_path, $new_path);
                     }
                 }
-                // ^ write here.
             } else {
                 $result = false;
             }
@@ -336,39 +335,39 @@ class Category extends Template
         }
 
         switch ($type) {
-        case 5: // relative URL
-            $cbc = $this->session->param('current_build_category');
-            if (!empty($cbc)) {
-                $build_cwd = trim($this->getCategoryPath($cbc, 3), '/');
-                $cwd = explode('/', $build_cwd);
-                $cwd = array_filter($cwd, function ($var) {
-                    return $var !== '' && $var !== '/';
-                });
-                $diff = count($path) - count($cwd);
-                $static = '.';
-                if ($diff > 0) {
-                    $category_path = implode('/', $path);
-                    $static = ltrim(str_replace($build_cwd, '', $category_path), '/');
-                } elseif ($diff < 0) {
-                    $static = rtrim(str_repeat('../', abs($diff)), '/');
+            case 5: // relative URL
+                $cbc = $this->session->param('current_build_category');
+                if (!empty($cbc)) {
+                    $build_cwd = trim($this->getCategoryPath($cbc, 3), '/');
+                    $cwd = explode('/', $build_cwd);
+                    $cwd = array_filter($cwd, function ($var) {
+                        return $var !== '' && $var !== '/';
+                    });
+                    $diff = count($path) - count($cwd);
+                    $static = '.';
+                    if ($diff > 0) {
+                        $category_path = implode('/', $path);
+                        $static = ltrim(str_replace($build_cwd, '', $category_path), '/');
+                    } elseif ($diff < 0) {
+                        $static = rtrim(str_repeat('../', abs($diff)), '/');
+                    }
+
+                    return $static . '/' . $file_name;
                 }
+                // no break
+            case 4: // physical URL
+                $path[] = $file_name;
 
-                return $static . '/' . $file_name;
-            }
-            // no break
-        case 4: // physical URL
-            $path[] = $file_name;
-
-            return $this->site_data['path'] . implode('/', $path);
-        case 3: // backward compatible
-            return preg_replace('/^\/+/', '/', File::realpath('/'.implode('/', $path).'/'));
-        case 2: // backward compatible
-            return File::realpath('/'.implode('/', $path));
-        case 1: // only directory
-            break;
-        case 0: // physical path
-            $path[] = $file_name;
-            break;
+                return $this->site_data['path'] . implode('/', $path);
+            case 3: // backward compatible
+                return preg_replace('/^\/+/', '/', File::realpath('/'.implode('/', $path).'/'));
+            case 2: // backward compatible
+                return File::realpath('/'.implode('/', $path));
+            case 1: // only directory
+                break;
+            case 0: // physical path
+                $path[] = $file_name;
+                break;
         }
 
         return File::realpath($this->site_data['openpath'] . '/' . implode('/', $path));
@@ -400,32 +399,32 @@ class Category extends Template
         $category_path = trim($this->getCategoryPath($unit['category'], 2), '/');
 
         switch ($type) {
-        case 4: // relative URL
-            $build_cwd = rtrim($this->getCategoryPath($this->session->param('current_build_category'), 4), '/');
-            $category_path = rtrim($this->getCategoryPath($unit['category'], 4), '/');
-            $cwd = explode('/', $build_cwd);
-            $ret = explode('/', $category_path);
-            $diff = count($ret) - count($cwd);
-            $static = '.';
-            if ($diff > 0) {
-                $static = ltrim(str_replace($build_cwd, '', $category_path), '/');
-            } elseif ($diff < 0) {
-                $static = rtrim(str_repeat('../', abs($diff)), '/');
-            }
-            $category_path = '';
-            break;
-        case 3: // URL
-            $static = rtrim($this->site_data['url'], '/') . '/';
-            break;
-        case 2: // absolute URL
-            $static = rtrim($this->site_data['path'], '/') . '/';
-            break;
-        case 1: // backward compatible
-            $static = '/';
-            break;
-        case 0: // physical path
-            $static = rtrim($this->site_data['openpath'], '/') . '/';
-            break;
+            case 4: // relative URL
+                $build_cwd = rtrim($this->getCategoryPath($this->session->param('current_build_category'), 4), '/');
+                $category_path = rtrim($this->getCategoryPath($unit['category'], 4), '/');
+                $cwd = explode('/', $build_cwd);
+                $ret = explode('/', $category_path);
+                $diff = count($ret) - count($cwd);
+                $static = '.';
+                if ($diff > 0) {
+                    $static = ltrim(str_replace($build_cwd, '', $category_path), '/');
+                } elseif ($diff < 0) {
+                    $static = rtrim(str_repeat('../', abs($diff)), '/');
+                }
+                $category_path = '';
+                break;
+            case 3: // URL
+                $static = rtrim($this->site_data['url'], '/') . '/';
+                break;
+            case 2: // absolute URL
+                $static = rtrim($this->site_data['path'], '/') . '/';
+                break;
+            case 1: // backward compatible
+                $static = '/';
+                break;
+            case 0: // physical path
+                $static = rtrim($this->site_data['openpath'], '/') . '/';
+                break;
         }
 
 
@@ -708,7 +707,6 @@ class Category extends Template
             array_unshift($arr_archives_name, $original_file);
 
             foreach ($arr_archives_name as $file_name) {
-
                 // if find same name in entries
                 if (strval($category['id']) !== strval($this->site_data['rootcategory'])
                     && method_exists($this, 'build')
