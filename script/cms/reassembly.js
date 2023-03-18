@@ -68,6 +68,7 @@ function cmsReassemblyGetEntries(event) {
             cmdReassemblingProgress.max = response.entries.length;
             cmdReassemblingProgress.value = 0;
             formData.set('mode', 'cms.entry.receive:reassemble');
+            formData.set('in_reassemble', '1');
             cmsReassemblyStart(response.entries, formData, 0, trigger);
         }
     }).catch((error) => {

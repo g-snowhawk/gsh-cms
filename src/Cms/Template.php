@@ -37,7 +37,8 @@ class Template extends \Gsnowhawk\Cms\Site
      */
     public function __construct()
     {
-        call_user_func_array('parent::__construct', func_get_args());
+        $params = func_get_args();
+        call_user_func_array(parent::class.'::__construct', $params);
 
         $this->kind_of_template = Lang::translate('KIND_OF_TEMPLATE');
     }
@@ -152,7 +153,7 @@ class Template extends \Gsnowhawk\Cms\Site
         );
 
         if (empty($save)) {
-            $dir = @realpath($this->app->cnf('application:cms_global_templates'));
+            $dir = @realpath($this->app->cnf('application:cms_global_templates') ?? '');
             $origin = $this->templatePath($id, $this->siteID, false);
             $save = [
                 'sourcecode' => file_get_contents($origin),

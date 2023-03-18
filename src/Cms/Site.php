@@ -60,12 +60,20 @@ class Site extends \Gsnowhawk\Cms
     private $categoryID;
 
     /**
+     * Root category
+     * This property for template engine
+     *
+     * @var int
+     */
+    protected $site_root;
+
+    /**
      * Object constructor.
      */
     public function __construct()
     {
         $params = func_get_args();
-        call_user_func_array('parent::__construct', $params);
+        call_user_func_array(parent::class.'::__construct', $params);
 
         $this->siteID = $this->session->param('current_site');
         if (!empty($this->siteID)) {
@@ -105,11 +113,10 @@ class Site extends \Gsnowhawk\Cms
 
         $site_data['owner'] = $this->ownerInfo($id);
 
-        if (!$this->view->inRendering()) {
-            $this->view->bind('site', $site_data);
-        }
+        $this->view->bind('site', $site_data);
 
         $site_data['rootcategory'] = self::rootCategory();
+        $this->site_root = $site_data['rootcategory'];
 
         return $site_data;
     }
@@ -207,7 +214,6 @@ class Site extends \Gsnowhawk\Cms
                         $result += $plugin_result;
                     }
                 }
-                // ^ write here.
             } else {
                 $result = false;
             }
@@ -406,7 +412,7 @@ class Site extends \Gsnowhawk\Cms
             return false;
         }
 
-        $global_templates = rtrim($this->app->cnf('application:cms_global_templates'), '/');
+        $global_templates = rtrim($this->app->cnf('application:cms_global_templates') ?? '', '/');
         if (!empty($global_templates) && !is_dir($global_templates)) {
             if (false === @mkdir($global_templates, 0777, true)) {
                 $global_templates = null;

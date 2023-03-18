@@ -27,7 +27,7 @@ class Response extends \Gsnowhawk\Cms\Category
     public function __construct()
     {
         $params = func_get_args();
-        call_user_func_array('parent::__construct', $params);
+        call_user_func_array(parent::class.'::__construct', $params);
 
         if (empty($this->siteID)) {
             trigger_error('No select a site', E_USER_ERROR);

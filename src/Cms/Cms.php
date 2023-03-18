@@ -48,7 +48,7 @@ class Cms extends User implements PackageInterface
     public function __construct()
     {
         $params = func_get_args();
-        call_user_func_array('parent::__construct', $params);
+        call_user_func_array(parent::class.'::__construct', $params);
 
         $this->view->addPath(self::templateDir());
 
@@ -320,18 +320,18 @@ class Cms extends User implements PackageInterface
             $cols = [];
             foreach ($fields as $field) {
                 switch ($field) {
-                case 'id':
-                    $cols[] = 'NULL AS id';
-                    break;
-                case 'revision':
-                    $cols[] = $this->db->quote($new_version).' AS revision';
-                    break;
-                case 'active':
-                    $cols[] = "'1' AS active";
-                    break;
-                default:
-                    $cols[] = $field;
-                    break;
+                    case 'id':
+                        $cols[] = 'NULL AS id';
+                        break;
+                    case 'revision':
+                        $cols[] = $this->db->quote($new_version).' AS revision';
+                        break;
+                    case 'active':
+                        $cols[] = "'1' AS active";
+                        break;
+                    default:
+                        $cols[] = $field;
+                        break;
                 }
             }
             if (false === $this->db->copyRecord($cols, $table, '', 'id = ?', [$id])) {

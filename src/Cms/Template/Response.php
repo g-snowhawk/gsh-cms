@@ -26,7 +26,7 @@ class Response extends \Gsnowhawk\Cms\Template
     public function __construct()
     {
         $params = func_get_args();
-        call_user_func_array('parent::__construct', $params);
+        call_user_func_array(parent::class.'::__construct', $params);
 
         if (empty($this->siteID)) {
             trigger_error('No select a site', E_USER_ERROR);
@@ -118,7 +118,7 @@ class Response extends \Gsnowhawk\Cms\Template
         $post['publish'] = 'draft';
 
         if (!empty($post['id'])) {
-            $dir = @realpath($this->app->cnf('application:cms_global_templates'));
+            $dir = @realpath($this->app->cnf('application:cms_global_templates') ?? '');
             $context = ['usable' => false, 'use' => null];
             $status = self::status($post['id'], $post['modify_date'], $dir, $context);
             $this->view->bind('status', $status);

@@ -26,7 +26,7 @@ class Section extends Entry
     public function __construct()
     {
         $params = func_get_args();
-        call_user_func_array('parent::__construct', $params);
+        call_user_func_array(parent::class.'::__construct', $params);
     }
 
     /**
@@ -259,7 +259,6 @@ class Section extends Entry
             && false !== $this->db->nsmCleanup('section', 'WHERE sitekey = ? and entrykey = ? and revision = ?', [$sitekey, $entrykey, '0'])
             && false !== $this->db->delete('section', 'identifier = ?', [$sectionkey])
         ) {
-
             // Rebuild entry file
             if ($rebuild === 'immediately' && !empty($entrykey)) {
                 $this->createEntryFile($entrykey);
