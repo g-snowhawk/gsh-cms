@@ -113,7 +113,9 @@ class Site extends \Gsnowhawk\Cms
 
         $site_data['owner'] = $this->ownerInfo($id);
 
-        $this->view->bind('site', $site_data);
+        if (is_a($this->view, 'Gsnowhawk\\View')) {
+            $this->view->bind('site', $site_data);
+        }
 
         $site_data['rootcategory'] = self::rootCategory();
         $this->site_root = $site_data['rootcategory'];

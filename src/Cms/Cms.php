@@ -50,7 +50,9 @@ class Cms extends User implements PackageInterface
         $params = func_get_args();
         call_user_func_array(parent::class.'::__construct', $params);
 
-        $this->view->addPath(self::templateDir());
+        if (is_a($this->view, 'Gsnowhawk\\View')) {
+            $this->view->addPath(self::templateDir());
+        }
 
         if (class_exists('Imagick')) {
             $this->command_convert = 'imagick';
