@@ -113,7 +113,7 @@ class Site extends \Gsnowhawk\Cms
 
         $site_data['owner'] = $this->ownerInfo($id);
 
-        if (is_a($this->view, 'Gsnowhawk\\View')) {
+        if (is_a($this->view, 'Gsnowhawk\\View') && false === $this->view->inRendering()) {
             $this->view->bind('site', $site_data);
         }
 
