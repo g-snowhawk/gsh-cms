@@ -420,6 +420,10 @@ class Cms extends User implements PackageInterface
 
     protected function pathToID($path)
     {
+        if (is_null($path)) {
+            return null;
+        }
+
         return trim(str_replace(['/','.'], ['-','_'], preg_replace('/\.html?$/', '', $path)), '-_');
     }
 

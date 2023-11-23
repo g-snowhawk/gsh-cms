@@ -1457,11 +1457,10 @@ class Category extends Template
         $build_type = $this->session->param('build_type');
 
         if ($build_type === 'entry') {
-            $entry_path = $this->getEntryPath($id);
-            $dir = dirname($entry_path);
+            $entry_path = $this->getEntryPath($id) ?? '';
             $basename = basename($entry_path);
             $entry = $this->db->get('id,category,filepath AS path,title', 'entry', 'id = ?', [$id]);
-            $categorykey = $entry['category'];
+            $categorykey = $entry['category'] ?? null;
         } elseif ($build_type === 'feed') {
             $feed = $this->db->get('id,path,title', 'template', 'id = ?', [$id]);
 
@@ -1733,6 +1732,10 @@ class Category extends Template
 
     protected function bindSiteData($path)
     {
+        if (is_null($path)) {
+            $path = '';
+        }
+
         $site = $this->site_data;
         if (isset($site['path'])) {
             $path = preg_replace('/^'.preg_quote($site['path'], '/').'/', '', $path);

@@ -1169,6 +1169,12 @@ class Entry extends Category
         $html_id = $this->pathToID($entry['url']);
         if (empty($html_id)) {
             $html_id = $html_class;
+            if (is_array($html_id)) {
+                if ($preview) {
+                    array_unshift($html_id, 'preview');
+                }
+                $html_id = implode('-', $html_id);
+            }
         }
         $this->setHtmlId($html_id);
 
@@ -1386,10 +1392,10 @@ class Entry extends Category
             $convert->setCompressionQuality($quarity);
             if ($pages === strtolower('all')) {
                 $end = $convert->getImageScene();
-            } elseif (preg_match('/^(\d+)-(\d+)?$/', $pages, $range)) {
+            } elseif (preg_match('/^(\d+)-(\d+)?$/', $pages ?? '', $range)) {
                 $start = (int)$range[1];
                 $end = (isset($range[2]) && !empty($range[2])) ? (int)$range[2] : $convert->getImageScene();
-            } elseif (preg_match('/^(\d+)$/', $pages, $range)) {
+            } elseif (preg_match('/^(\d+)$/', $pages ?? '', $range)) {
                 $start = $end = (int)$pages;
             }
             for ($i = $start; $i <= $end; $i++) {
