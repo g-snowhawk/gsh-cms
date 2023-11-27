@@ -13,7 +13,7 @@ switch (document.readyState) {
         break;
     case 'interactive':
     case 'complete':
-        somefunc();
+        tmsAttachmentsInit();
         break;
 }
 
@@ -30,7 +30,9 @@ let tmsAttachmentsDragTarget = undefined;
 
 function tmsAttachmentsInit(event) {
     const uploader = document.getElementById(tmsAttachmentsUploaderId);
-    if (!uploader) return;
+    if (!uploader) {
+        return;
+    }
 
     const fileset = uploader.querySelectorAll('.' + tmsAttachmentsFilesetClassName);
     fileset.forEach((element) => {
@@ -38,6 +40,14 @@ function tmsAttachmentsInit(event) {
     });
 
     tmsAttachmentsCountThumbnails();
+}
+
+function tmsAttachmentsReinit(element) {
+    tmsAttachmentsSetEventListener(element);
+    const origin = document.getElementById(tmsAttachmentsOriginId);
+    if (origin !== element) {
+        tmsAttachmentsSetEventListener(origin);
+    }
 }
 
 function tmsAttachmentsSetEventListener(element) {
@@ -106,6 +116,15 @@ function tmsAttachmentsOnDragEnter(event) {
 function tmsAttachmentsOnDrop(event) {
     event.preventDefault();
     const element = tmsAttachmentsGetElement(event);
+
+    const input = element.querySelector('input[type=file]');
+    if (input && event.dataTransfer.files.length > 0) {
+        input.files = event.dataTransfer.files;
+        if (typeof TM.uploader.thumbnail === 'function') {
+            TM.uploader.thumbnail(input);
+        }
+    }
+
     if (tmsAttachmentsDragTarget) {
         element.parentNode.insertBefore(tmsAttachmentsDragTarget, element);
     }
