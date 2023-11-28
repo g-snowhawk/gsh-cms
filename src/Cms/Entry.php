@@ -1144,6 +1144,9 @@ class Entry extends Category
             return $this->buildArchive($categorykey, $preview);
         }
 
+        // Entry body is not nullable
+        $entry['body'] = $entry['body'] ?? '';
+
         $this->view->bind('current', $entry);
 
         $this->bindSiteData($entry['url']);
