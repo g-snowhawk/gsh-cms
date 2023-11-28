@@ -1603,6 +1603,8 @@ class Entry extends Category
 
         $preview_attachments[] = $data;
         $this->session->param('preview_attachments', $preview_attachments);
+
+        $this->app->execPlugin('setPreviewAttachments');
     }
 
     private function moveUploadedFile(
