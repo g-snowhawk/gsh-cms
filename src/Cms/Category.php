@@ -915,7 +915,7 @@ class Category extends Template
 
         if ($this->site_data['type'] === 'dynamic' && $this->view->param('isfrontend') === 1) {
             $statement .= ' AND (`acl` = 0 OR `acl`&?)';
-            $options[] = $this->userinfo['priv'];
+            $options[] = $this->userinfo['priv'] ?? null;
         }
 
         if (is_null($chroot)) {
