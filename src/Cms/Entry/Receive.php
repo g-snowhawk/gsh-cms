@@ -327,6 +327,9 @@ class Receive extends Response
         exit;
     }
 
+    /**
+     * @cli available
+     */
     public function ajaxReassembly()
     {
         $this->startPolling();
