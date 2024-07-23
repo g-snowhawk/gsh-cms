@@ -618,6 +618,8 @@ class Site extends \Gsnowhawk\Cms
      */
     public static function filteredSite(Db $db, $userkey)
     {
+        $tmp = $db->select('id', 'site');
+        $sites = array_column($tmp, 'id');
         $filtered = [];
         if (false !== ($ret = $db->select(
             'filter1',
@@ -626,7 +628,9 @@ class Site extends \Gsnowhawk\Cms
             [$userkey, 'cms', 'site', 'read', 1]
         ))) {
             foreach ((array) $ret as $unit) {
-                $filtered[] = $unit['filter1'];
+                if (in_array($unit['filter1'], $sites)) {
+                    $filtered[] = $unit['filter1'];
+                }
             }
         }
         if (false !== ($owned = $db->select('id', 'site', 'WHERE userkey = ?', [$userkey]))) {
@@ -694,6 +698,11 @@ class Site extends \Gsnowhawk\Cms
             }
         }
 
+        if ($this->session->param('current_site') === $sitekey) {
+            $esc_sitekey = $sitekey;
+            $this->session->clear('current_site');
+        }
+
         try {
             File::rmdirs($this->app->cnf('global:data_dir').'/mirror/'.$sitekey, true);
             $results = $this->app->execPlugin('afterRemoveCmsSite', $sitekey);
@@ -703,11 +712,12 @@ class Site extends \Gsnowhawk\Cms
                 }
             }
         } catch (ErrorException $e) {
-            return false;
-        }
+            trigger_error($e->getMessage());
+            if (isset($esc_sitekey)) {
+                $this->session->param('current_site', $esc_sitekey);
+            }
 
-        if ($this->session->param('current_site') === $sitekey) {
-            $this->session->clear('current_site');
+            return false;
         }
 
         if (false === $this->db->commit()) {
@@ -947,7 +957,7 @@ class Site extends \Gsnowhawk\Cms
     {
         $previous = $this->session->param('current_category');
         if (is_null($id)) {
-            $id = $this->site_data['rootcategory'];
+            $id = $this->site_data['rootcategory'] ?? null;
         }
 
         if (false !== $this->hideSiteRoot() && $id === $this->site_data['rootcategory']) {
