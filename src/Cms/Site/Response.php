@@ -137,7 +137,7 @@ class Response extends \Gsnowhawk\Cms\Site
             ];
             $port = Env::server('server_port');
             $post['url'] = 'http'
-                 . (($port === '443' || Env::server('https') === 'on') ? 's' : '')
+                 . (($port === '443' || Env::server('https') === 'on' || Env::server('http_x_forwarded_proto')) ? 's' : '')
                  . '://'
                  . Env::server('http_host') . '/';
 
