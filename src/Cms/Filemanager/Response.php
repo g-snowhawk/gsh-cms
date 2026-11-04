@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of G.Snowhawk Application.
  *
@@ -10,6 +11,7 @@
 
 namespace Gsnowhawk\Cms\Filemanager;
 
+use ErrorException;
 use Gsnowhawk\Common\File;
 use Gsnowhawk\Common\Http;
 
@@ -38,7 +40,7 @@ class Response extends \Gsnowhawk\Filemanager
         $sid = $this->session->param('current_site');
 
         if (empty($sid)) {
-            trigger_error('No select a site', E_USER_ERROR);
+            throw new ErrorException('No select a site');
         }
 
         $site = $this->db->get('openpath,uploaddir,url', 'site', 'id = ?', [$sid]);

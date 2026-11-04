@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of G.Snowhawk Application.
  *
@@ -10,6 +11,7 @@
 
 namespace Gsnowhawk\Cms\Entry;
 
+use ErrorException;
 use Gsnowhawk\Common\Environment;
 use Gsnowhawk\Common\File;
 use Gsnowhawk\Common\Http;
@@ -36,7 +38,7 @@ class Response extends \Gsnowhawk\Cms\Entry
         call_user_func_array(parent::class.'::__construct', $params);
 
         if (empty($this->siteID)) {
-            trigger_error('No select a site', E_USER_ERROR);
+            throw new ErrorException('No select a site');
         }
 
         $this->view->bind(
@@ -375,7 +377,8 @@ class Response extends \Gsnowhawk\Cms\Entry
             $this->view->bind('referer', $cookie);
         }
 
-        $this->pager->setLinkFormat($this->app->systemURI().'?mode=cms.entry.response:trash&p=%d');
+        $redirect = $this->urlMapping('?mode=cms.entry.response:trash&p=%d');
+        $this->pager->setLinkFormat($this->app->systemURI().$redirect);
         $this->view->bind('pager', $this->pager);
         //$this->view->bind('err', $this->app->err);
 

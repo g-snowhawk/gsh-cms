@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of G.Snowhawk Application.
  *
@@ -10,7 +11,8 @@
 
 namespace Gsnowhawk\Cms;
 
-use Gsnowhawk\Common\Environment;
+use ErrorException;
+use Gsnowhawk\Common\Environment as Env;
 use Gsnowhawk\Common\Http;
 use Gsnowhawk\Common;
 use Gsnowhawk\ViewException;
@@ -56,7 +58,7 @@ class Dynamic extends Section
         }
 
         if ($this->siteProperty('type') !== 'dynamic') {
-            trigger_error('Site type mismatch', E_USER_ERROR);
+            throw new ErrorException('Site type mismatch');
         }
 
         // Switch request with parameters or static URI
@@ -111,6 +113,13 @@ class Dynamic extends Section
         header('X-XSS-Protection: 1');
         header('X-Content-Type-Options: nosniff');
         echo $source;
+
+        $request_uri = Env::server('request_uri');
+        if (defined('LOG_URL_DECODE') && LOG_URL_DECODE === true) {
+            $request_uri = urldecode($request_uri);
+        }
+        $this->app->syslog('Open %s', [$request_uri]);
+
         exit(0);
     }
 
@@ -143,7 +152,7 @@ class Dynamic extends Section
         }
 
         $path1 = parse_url($this->site_data['url'] ?? '', PHP_URL_PATH);
-        $path2 = parse_url(Environment::server('request_uri'), PHP_URL_PATH);
+        $path2 = parse_url(Env::server('request_uri'), PHP_URL_PATH);
         if (rtrim($path1, '/') === rtrim($path2, '/')) {
             $this->session->clear('direct_uri');
         }
@@ -151,7 +160,7 @@ class Dynamic extends Section
         $this->view->bind(
             'form',
             [
-                'action' => Environment::server('REQUEST_URI'),
+                'action' => Env::server('REQUEST_URI'),
                 'method' => 'post',
                 'enctype' => 'application/x-www-form-urlencoded',
             ]
@@ -179,6 +188,11 @@ class Dynamic extends Section
     {
         $url = preg_replace('/\?.*$/', '', $this->urlToPath());
         $basename = basename($url);
+
+        if (!empty($this->request->param('org'))) {
+            $basename = basename($this->request->param('org'));
+        }
+
         if (empty($basename)) {
             $basename = '/';
         }
@@ -229,7 +243,7 @@ class Dynamic extends Section
      */
     private function findEntryFromParameter()
     {
-        $query_string = Environment::server('query_string');
+        $query_string = Env::server('query_string');
         if (empty($query_string)) {
             return self::findEntryFromURI();
         }

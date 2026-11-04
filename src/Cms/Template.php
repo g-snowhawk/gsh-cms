@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of G.Snowhawk Application.
  *
@@ -78,18 +79,15 @@ class Template extends \Gsnowhawk\Cms\Site
             }
         }
 
+        $syslog_format = "Save the template `%d'";
         if (empty($post['id'])) {
             $raw = ['create_date' => 'CURRENT_TIMESTAMP'];
             $save['sitekey'] = $this->siteID;
             if (false !== $result = $this->db->insert($table, $save, $raw)) {
                 $post['id'] = $this->db->lastInsertId(null, 'id');
-                $this->db->update(
-                    $table,
-                    ['identifier' => $post['id']],
-                    'id = ?',
-                    [$post['id']]
-                );
+                $this->db->update($table, ['identifier' => $post['id']], 'id = ?', [$post['id']]);
             }
+            $syslog_format = "Save new template `%d'";
         } else {
             $old_path = $this->templatePath($id, $this->siteID);
             $result = $this->db->update($table, $save, 'id = ?', [$post['id']], $raw);
@@ -126,7 +124,11 @@ class Template extends \Gsnowhawk\Cms\Site
                 $result = false;
             }
             if ($result !== false) {
-                return $this->db->commit();
+                if ($this->db->commit()) {
+                    $this->app->syslog($syslog_format, [$post['id']], 101);
+
+                    return true;
+                }
             }
         }
 
@@ -196,6 +198,7 @@ class Template extends \Gsnowhawk\Cms\Site
                     unlink($file);
                 }
             }
+            $this->app->syslog("Remove the template `%d'", [$id], 101);
 
             return true;
         }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of G.Snowhawk Application.
  *
@@ -10,6 +11,7 @@
 
 namespace Gsnowhawk\Cms\Template;
 
+use ErrorException;
 use Gsnowhawk\Common\Lang;
 
 /**
@@ -29,7 +31,7 @@ class Response extends \Gsnowhawk\Cms\Template
         call_user_func_array(parent::class.'::__construct', $params);
 
         if (empty($this->siteID)) {
-            trigger_error('No select a site', E_USER_ERROR);
+            throw new ErrorException('No select a site');
         }
 
         $this->view->bind(
@@ -111,6 +113,11 @@ class Response extends \Gsnowhawk\Cms\Template
                 'id = ? AND sitekey = ?',
                 [$this->request->param($param_key), $this->siteID]
             );
+
+            if (false === $post) {
+                $post = [];
+            }
+
             if (!empty($this->request->param('cp'))) {
                 $post['title'] .= ' (Copied)';
             }

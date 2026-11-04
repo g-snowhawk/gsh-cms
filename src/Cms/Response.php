@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of G.Snowhawk Application.
  *
@@ -46,13 +47,13 @@ class Response extends Section
         return $this->categoryData($id, $columns);
     }
 
-    public function filterCategories($filter, $column = '*', array $targets = null)
+    public function filterCategories($filter, $column = '*', ?array $targets = null)
     {
         if (empty($filter)) {
             return;
         }
 
-        if (empty($targets)) {
+        if (is_null($targets)) {
             $targets = ['id', 'path', 'title', 'tags'];
         }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of G.Snowhawk Application.
  *
@@ -10,6 +11,7 @@
 
 namespace Gsnowhawk\Cms\Category;
 
+use ErrorException;
 use Gsnowhawk\PermitException;
 use Gsnowhawk\Common\Lang;
 
@@ -30,7 +32,7 @@ class Response extends \Gsnowhawk\Cms\Category
         call_user_func_array(parent::class.'::__construct', $params);
 
         if (empty($this->siteID)) {
-            trigger_error('No select a site', E_USER_ERROR);
+            throw new ErrorException('No select a site');
         }
 
         $this->view->bind(

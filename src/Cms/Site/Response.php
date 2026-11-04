@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of G.Snowhawk Application.
  *
@@ -91,10 +92,13 @@ class Response extends \Gsnowhawk\Cms\Site
         $rows_per_page = intval($_COOKIE['rows_per_page_sitelist'] ?? $this->rows_per_page);
         $total_count = $this->db->recordCount($sql, $options);
         $offset_list = $rows_per_page * ($current_page - 1);
+
+        $link_format = static::urlMapping('?mode='.parent::DEFAULT_MODE.'&p=%d');
+
         $pager = clone $this->pager;
         $pager->init($total_count, $rows_per_page);
         $pager->setCurrentPage($current_page);
-        $pager->setLinkFormat($this->app->systemURI().'?mode='.parent::DEFAULT_MODE.'&p=%d');
+        $pager->setLinkFormat($this->app->systemURI().$link_format);
         $this->view->bind('pager', $pager);
         $sql .= " LIMIT $offset_list,$rows_per_page";
         $post['rows_per_page_sitelist'] = $rows_per_page;
@@ -151,6 +155,12 @@ class Response extends \Gsnowhawk\Cms\Site
 
         // Site owner candidate
         $this->view->bind('owners', $this->siteOwnerCandidates());
+
+        $referer = $this->urlMapping('?mode=cms.site.response&p=%d');
+        $current_page = (int)$this->session->param(self::SITELIST_PAGE_KEY) ?: 1;
+        if ($current_page > 1) {
+            $this->view->bind('referer', sprintf($referer, $current_page));
+        }
 
         $globals = $this->view->param();
         $form = $globals['form'] ?? [];

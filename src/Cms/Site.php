@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of G.Snowhawk Application.
  *
@@ -251,9 +252,9 @@ class Site extends \Gsnowhawk\Cms
 
         $this->session->param('current_site', $id);
         $this->session->clear('current_category');
-        $this->app->logger->log("Selected site `{$id}'");
         $this->siteID = $id;
         $this->site_data = $this->loadSiteData($id);
+        $this->app->syslog("Selected site `%d'", [$id]);
 
         $this->setCategory();
     }
@@ -774,6 +775,22 @@ class Site extends \Gsnowhawk\Cms
             return false;
         }
 
+        $revoke_owner = [
+            'system',
+            'cms.site.create',
+            'cms.site.remove',
+            'cms.site.noroot',
+        ];
+        if (!in_array($type, $revoke_owner) && $this->isOwner($filter1)) {
+            $priv = parent::getPrivilege($type, $filter1, $filter2);
+
+            if (false === $priv) {
+                $priv = '0';
+            }
+
+            return ($priv !== '0');
+        }
+
         try {
             parent::checkPermission($type, $filter1, $filter2);
 
@@ -972,7 +989,7 @@ class Site extends \Gsnowhawk\Cms
                 ))) {
                     throw new PermitException(Lang::translate('PERMISSION_DENIED'), 403, E_ERROR, __FILE__, __LINE__);
                 }
-                $this->site_data['first_category'] = $chroot[0]['id'];
+                $this->site_data['first_category'] = $chroot[0]['id'] ?? null;
             }
             $id = $this->site_data['first_category'];
         }

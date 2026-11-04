@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of G.Snowhawk Application.
  *
@@ -253,6 +254,10 @@ class Cms extends User implements PackageInterface
         if (!in_array($key, $revoke_owner) && $this->isOwner($filter1)) {
             $priv = parent::getPrivilege($key, $filter1, $filter2);
 
+            if (false === $priv) {
+                $priv = '0';
+            }
+
             return ($priv !== '0');
         }
 
@@ -355,6 +360,13 @@ class Cms extends User implements PackageInterface
         $path = $this->templatePath($id, $sitekey);
 
         $this->view->clearCache($path);
+
+        if (!empty($this->app->cnf('application:cms_global_templates'))) {
+            $files = glob($this->app->cnf('application:cms_global_templates') . '/*.tpl');
+            foreach ($files as $file) {
+                $this->view->clearCache($file);
+            }
+        }
 
         $sourcecode = (strval($post['kind']) === '6')
             ? $this->view->render($post['sourcecode'], true, true)
@@ -516,5 +528,10 @@ class Cms extends User implements PackageInterface
             $view = $this->view;
         }
         $view->setPath($dir);
+    }
+
+    public function setSyslogOption($caller, &$log)
+    {
+        $log['site_id'] = $this->siteID ?? 0;
     }
 }

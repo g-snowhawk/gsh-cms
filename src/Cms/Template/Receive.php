@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of G.Snowhawk Application.
  *
@@ -10,6 +11,7 @@
 
 namespace Gsnowhawk\Cms\Template;
 
+use ErrorException;
 use Gsnowhawk\Common\Http;
 use Gsnowhawk\Common\Lang;
 
@@ -21,6 +23,8 @@ use Gsnowhawk\Common\Lang;
  */
 class Receive extends Response
 {
+    public const REDIRECT_MODE = 'cms.template.response';
+
     /**
      * Save the data.
      */
@@ -28,9 +32,8 @@ class Receive extends Response
     {
         if (parent::save()) {
             $this->session->param('messages', Lang::translate('SUCCESS_SAVED'));
-            Http::redirect(
-                $this->app->systemURI().'?mode=cms.template.response'
-            );
+            $format = static::urlMapping('?mode='.self::REDIRECT_MODE);
+            Http::redirect($this->app->systemURI().$format);
         }
         $this->view->bind('err', $this->app->err);
         $this->edit();
@@ -40,9 +43,8 @@ class Receive extends Response
     {
         if (parent::revokeDraft()) {
             $this->session->param('messages', Lang::translate('SUCCESS_SAVED'));
-            Http::redirect(
-                $this->app->systemURI().'?mode=cms.template.response'
-            );
+            $format = static::urlMapping('?mode='.self::REDIRECT_MODE);
+            Http::redirect($this->app->systemURI().$format);
         }
         $this->view->bind('err', $this->app->err);
         $this->edit();
@@ -56,9 +58,8 @@ class Receive extends Response
         if (parent::remove()) {
             $this->session->param('messages', Lang::translate('SUCCESS_REMOVED'));
         }
-        Http::redirect(
-            $this->app->systemURI().'?mode=cms.template.response'
-        );
+        $format = static::urlMapping('?mode='.self::REDIRECT_MODE);
+        Http::redirect($this->app->systemURI().$format);
     }
 
     public function rebuildStyleSheets()
@@ -80,7 +81,7 @@ class Receive extends Response
             $sourcecode = $this->view->render($style['sourcecode'], true, true);
             try {
                 file_put_contents($path, $sourcecode);
-            } catch (\ErrorException $e) {
+            } catch (ErrorException $e) {
                 trigger_error($e->getMessage());
 
                 return false;
