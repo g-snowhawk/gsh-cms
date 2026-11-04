@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of G.Snowhawk Application.
  *
@@ -359,7 +360,7 @@ class Receive extends Response
             && parent::intoTrash('entry', $identifier, $options)
         ) ? 0 : 1;
 
-        $format = ($status > 0) ? "Failed entry into the trash" : "Success entry `%d' into the trash";
+        $format = ($status > 0) ? 'Failed entry into the trash' : "Success entry `%d' into the trash";
 
         $response = [
             'status' => $status,
@@ -386,7 +387,7 @@ class Receive extends Response
         ];
         $status = (parent::intoTrash('entry', $identifier, $options, '0')) ? 0 : 1;
 
-        $format = ($status > 0) ? "Failed entry put out the trash" : "Success entry `%d' put out the trash";
+        $format = ($status > 0) ? 'Failed entry put out the trash' : "Success entry `%d' put out the trash";
 
         $response = [
             'status' => $status,
@@ -438,7 +439,7 @@ class Receive extends Response
             $this->db->rollback();
         } else {
             $this->db->commit();
-            $this->app->syslog("Empty trash", [], 101);
+            $this->app->syslog('Empty trash', [], 101);
         }
 
         $redirect = static::urlMapping('?mode=cms.entry.response:trash');
