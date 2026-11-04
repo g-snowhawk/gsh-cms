@@ -210,7 +210,7 @@ class Category extends Template
                     if ($reassembly) {
                         self::reassembly($this->categoryID);
                     }
-                    $this->app->logger->log("Save the category `{$post['id']}'", 201);
+                    $this->app->syslog("Save the category `%d'", [$post['id']], 201);
 
                     return $this->db->commit();
                 }
@@ -252,7 +252,7 @@ class Category extends Template
                 if ($this->siteProperty('type') === 'static') {
                     self::reassembly($parent);
                 }
-                $this->app->logger->log("Remove the category `{$id}'", 201);
+                $this->app->syslog("Remove the category `%d'", [$id], 201);
 
                 return $this->db->commit();
             }
@@ -652,7 +652,7 @@ class Category extends Template
         $this->page_separation_watcher = $apps->page_separation;
 
         if ($this->session->param('ispreview') === 1) {
-            $js = PHP_EOL.'<script src="script/cms/preview.js"></script>';
+            $js = PHP_EOL.'<script src="'.$this->cnf('global:assets_path').'script/cms/preview.js"></script>';
             if (preg_match("/<\/(body|html)>/i", $source, $match)) {
                 $source = preg_replace('/'.preg_quote($match[0], '/').'/', $js.$match[0], $source);
             } else {
@@ -721,11 +721,11 @@ class Category extends Template
                         if (empty($source)) {
                             if (file_exists($path)) {
                                 @unlink($path);
-                                $this->app->logger->log("Remove archive file `$path'", 201);
+                                $this->app->syslog("Remove archive file `%s'", [$path], 201);
                             }
                         } else {
                             file_put_contents($path, $source);
-                            $this->app->logger->log("Create archive file `$path'", 201);
+                            $this->app->syslog("Create archive file `%s'", [$path], 201);
                         }
                         continue;
                     }
@@ -1088,7 +1088,7 @@ class Category extends Template
      *
      * @return array
      */
-    public function sections($entrykey, $sectionkey, array $columns = null, $sort = 'ASC')
+    public function sections($entrykey, $sectionkey, ?array $columns = null, $sort = 'ASC')
     {
         $cols = ['children.id AS relkey'];
         if (is_null($columns)) {
@@ -1223,7 +1223,7 @@ class Category extends Template
      *
      * @return array
      */
-    public function childSections($eid, $id, array $columns = null, $order_by = ' ORDER BY children.author_date')
+    public function childSections($eid, $id, ?array $columns = null, $order_by = ' ORDER BY children.author_date')
     {
         $cols = [];
         if (is_null($columns)) {

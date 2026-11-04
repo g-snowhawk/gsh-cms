@@ -61,10 +61,17 @@ class Section extends Entry
         }
         $this->db->begin();
 
-        $fields = $this->db->getFields($this->db->TABLE($table));
+        $fields = $this->db->getFields($this->db->TABLE($table), true);
         $save = ['revision' => '0'];
         $raw = [];
-        foreach ($fields as $field) {
+        foreach ($fields as $unit) {
+            $field = $unit['Field'];
+            $null = ($unit['Null'] === 'YES');
+
+            if ($field === 'body') {
+                $null = false;
+            }
+
             if (in_array($field, $skip)) {
                 continue;
             }

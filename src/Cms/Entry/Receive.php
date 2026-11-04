@@ -48,7 +48,7 @@ class Receive extends Response
         $message = 'SUCCESS_SAVED';
         $status = 0;
         $options = [];
-        $response = [[$this, 'redirect'], [$redirect_mode, $redirect_type]];
+        $response = [[$this, 'redirect'], $redirect_mode, $redirect_type];
 
         if (!parent::save()) {
             $message = 'FAILED_SAVE';
@@ -77,7 +77,7 @@ class Receive extends Response
         $message = 'SUCCESS_SAVED';
         $status = 0;
         $options = [];
-        $response = [[$this, 'redirect'], [$redirect_mode, $redirect_type]];
+        $response = [[$this, 'redirect'], $redirect_mode, $redirect_type];
 
         if (!parent::revokeDraft($type)) {
             $message = 'FAILED_SAVE';
@@ -245,7 +245,7 @@ class Receive extends Response
                 ];
                 $args = [];
             } else {
-                $this->app->logger->log("Reassembly the site `{$this->siteID}'", 101);
+                $this->app->syslog("Reassembly the site `%d'", [$this->siteID], 101);
             }
         }
 
@@ -263,7 +263,8 @@ class Receive extends Response
             trigger_error('Irrigal operation', E_USER_WARNING);
         }
 
-        Http::redirect($this->app->systemURI().'?mode=cms.entry.response');
+        $redirect = static::urlMapping('?mode=cms.entry.response');
+        Http::redirect($this->app->systemURI().$redirect);
     }
 
     public function ajaxUploadImage()
@@ -358,15 +359,20 @@ class Receive extends Response
             && parent::intoTrash('entry', $identifier, $options)
         ) ? 0 : 1;
 
-        $message = $status > 0
-            ? 'Failed into the trash'
-            : 'Success into the trash';
+        $format = ($status > 0) ? "Failed entry into the trash" : "Success entry `%d' into the trash";
+
         $response = [
             'status' => $status,
-            'message' => $message,
+            'message' => sprintf($format, $identifier),
         ];
+
         header('Content-type: application/json; charset=utf-8');
         echo json_encode($response);
+
+        if ($status === 0) {
+            $this->app->syslog($format, [$identifier], 101);
+        }
+
         exit;
     }
 
@@ -378,19 +384,22 @@ class Receive extends Response
             'statement' => 'id = ? OR identifier = ?',
             'replaces' => [$identifier, $identifier],
         ];
-        $status = (
-            parent::intoTrash('entry', $identifier, $options, '0')
-        ) ? 0 : 1;
+        $status = (parent::intoTrash('entry', $identifier, $options, '0')) ? 0 : 1;
 
-        $message = $status > 0
-            ? 'Failed put out the trash'
-            : 'Success put out the trash';
+        $format = ($status > 0) ? "Failed entry put out the trash" : "Success entry `%d' put out the trash";
+
         $response = [
             'status' => $status,
-            'message' => $message,
+            'message' => sprintf($format, $identifier),
         ];
+
         header('Content-type: application/json; charset=utf-8');
         echo json_encode($response);
+
+        if ($status === 0) {
+            $this->app->syslog($format, [$identifier], 101);
+        }
+
         exit;
     }
 
@@ -429,11 +438,11 @@ class Receive extends Response
             $this->db->rollback();
         } else {
             $this->db->commit();
+            $this->app->syslog("Empty trash", [], 101);
         }
 
-        Http::redirect(
-            $this->app->systemURI().'?mode=cms.entry.response:trash'
-        );
+        $redirect = static::urlMapping('?mode=cms.entry.response:trash');
+        Http::redirect($this->app->systemURI().$redirect);
     }
 
     public function getReassembleList()

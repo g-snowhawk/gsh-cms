@@ -108,6 +108,11 @@ class Entry extends Category
         foreach ($fields as $unit) {
             $field = $unit['Field'];
             $null = ($unit['Null'] === 'YES');
+
+            if ($field === 'body') {
+                $null = false;
+            }
+
             if (in_array($field, $skip)) {
                 continue;
             }
@@ -139,6 +144,7 @@ class Entry extends Category
             $save['author_date'] = date('Y-m-d H:i');
         }
 
+        $syslog_format = "Save the entry `%d'";
         $result = 0;
         $origin = null;
         if (empty($post['id'])) {
@@ -156,6 +162,7 @@ class Entry extends Category
                 );
                 $post['id'] = $entrykey;
             }
+            $syslog_format = "Save new entry `%d'";
         } else {
             $statement = 'id = ? AND sitekey = ?';
             $options = [$post['id'], $this->siteID];
@@ -211,11 +218,13 @@ class Entry extends Category
                     if (false === $this->release($post, $copy, $origin)) {
                         $result = false;
                     }
+                    $syslog_format = "Publish entry `%d'";
                 } elseif ($this->request->param('publish') === 'private') {
                     $entrykey = $this->db->get('id', self::ENTRY_TABLE, 'identifier = ? AND active = 1', [$post['id']]);
                     if (false === $this->toPrivate($entrykey)) {
                         $result = false;
                     }
+                    $syslog_format = "Private entry `%d'";
                 } else {
                     if ($result === 0) {
                         $this->app->err['vl_nochange'] = 1;
@@ -228,7 +237,7 @@ class Entry extends Category
                 $result = false;
             }
             if ($result !== false) {
-                $this->app->logger->log("Save the entry `{$entrykey}'", 101);
+                $this->app->syslog($syslog_format, [$entrykey], 101);
 
                 $commit = $this->db->commit();
 
@@ -304,7 +313,7 @@ class Entry extends Category
         }
 
         if ($return_value !== false) {
-            $this->app->logger->log("Revoke the draft from {$type} `{$origin}'", 101);
+            $this->app->syslog("Revoke the draft from %s `%s'", [$type, $origin], 101);
             if (false !== $this->db->commit()) {
                 return true;
             }
@@ -488,7 +497,7 @@ class Entry extends Category
     protected function removeFiles($entrykey, $sectionkey = null)
     {
         if (empty($entrykey)) {
-            trigger_error('Unexpected error', E_USER_ERROR);
+            throw new ErrorException('Unexpected error');
         }
         $upload_dir = $this->fileUploadDir($entrykey, $sectionkey);
 
@@ -647,10 +656,10 @@ class Entry extends Category
                         return false;
                     }
                     file_put_contents($release_path, $source);
-                    $this->app->logger->log("Create entry file `$release_path'", 101);
+                    $this->app->syslog("Create entry file `%s'", [$release_path], 101);
                 } elseif (file_exists($release_path)) {
                     @unlink($release_path);
-                    $this->app->logger->log("Remove entry file `$release_path'", 101);
+                    $this->app->syslog("Remove entry file `%s'", [$release_path], 101);
                 }
                 $this->buildArchives($new_entrykey);
                 $this->buildFeeds();
@@ -998,7 +1007,7 @@ class Entry extends Category
         $this->request->param('category', $category);
         if ($result !== false && false !== $this->db->delete(self::SECTION_TABLE, 'entrykey = ?', [$entrykey])) {
             if (false !== $this->db->delete(self::ENTRY_TABLE, 'identifier = ?', [$entrykey])) {
-                $this->app->logger->log("Remove the entry `{$entrykey}'", 101);
+                $this->app->syslog("Remove the entry `%d'", [$entrykey], 101);
 
                 $commit = $this->db->commit();
 
@@ -1072,7 +1081,7 @@ class Entry extends Category
                         }
                     }
                 } elseif ($is_frontend) {
-                    trigger_error('Request is not found', E_USER_ERROR);
+                    throw new ErrorException('Request is not found');
                 }
             }
         }
@@ -1109,12 +1118,7 @@ class Entry extends Category
         $apps = new Response($this->app);
         $this->view->bind('apps', $apps);
 
-        $template = $this->db->get(
-            'sourcecode,kind,path',
-            'template',
-            'identifier = ?',
-            [$tid]
-        );
+        $template = $this->db->get('sourcecode,kind,path', 'template', 'identifier = ?', [$tid]);
 
         if (!is_null($template['kind'])) {
             $template['kind'] = intval($template['kind']);
@@ -1125,12 +1129,7 @@ class Entry extends Category
             && $category['path'] === '/'
             && $this->defaultPage($entry['category']) === $entry['filepath']
         ) {
-            $template = $this->db->get(
-                'id,sourcecode,kind,path',
-                'template',
-                'kind = ?',
-                ['1']
-            );
+            $template = $this->db->get('id,sourcecode,kind,path', 'template', 'kind = ?', ['1']);
             $tid = $template['id'];
         }
 
@@ -1195,7 +1194,7 @@ class Entry extends Category
         $this->session->param('build_type', $build_type);
 
         if ($this->session->param('ispreview') === 1) {
-            $js = PHP_EOL.'<script src="script/cms/preview.js"></script>';
+            $js = PHP_EOL.'<script src="'.$this->cnf('global:assets_path').'script/cms/preview.js"></script>';
             if (preg_match("/<\/(body|html)>/i", $source, $match)) {
                 $source = preg_replace('/'.preg_quote($match[0], '/').'/', $js.$match[0], $source);
             } else {
@@ -1298,7 +1297,7 @@ class Entry extends Category
      *
      * @return array
      */
-    public function relations($entrykey, array $columns = null)
+    public function relations($entrykey, ?array $columns = null)
     {
         $cols = [];
         if (is_null($columns)) {
@@ -1329,7 +1328,7 @@ class Entry extends Category
      *
      * @return array
      */
-    public function recommends($entrykey, array $columns = null)
+    public function recommends($entrykey, ?array $columns = null)
     {
         $cols = [];
         if (is_null($columns)) {
