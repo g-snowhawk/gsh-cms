@@ -98,7 +98,11 @@ class Response extends \Gsnowhawk\Filemanager
     protected function extraPermission($key, $filter1 = 0, $filter2 = 0, ...$args)
     {
         $sitekey = $this->session->param('current_site');
-        if (!empty($sitekey) && $key !== 'system' && strpos($key, 'noroot') === false) {
+        $revoke_owner = [
+            'system',
+            'log.read',
+        ];
+        if (!empty($sitekey) && !in_array($key, $revoke_owner) && strpos($key, 'noroot') === false) {
             $owner = $this->db->get('userkey', 'site', 'id = ?', [$sitekey]);
             if ($owner === $this->uid) {
                 return true;

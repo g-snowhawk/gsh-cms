@@ -116,6 +116,13 @@ Explorer.prototype.onBlur = function(element) {
 }
 
 Explorer.prototype.rewind = function(name) {
+    var url = undefined;
+    if (name.filename) {
+        if (name.url) {
+            url = name.url;
+        }
+        name = name.filename;
+    }
     var element = document.querySelector('[name=newname].'+this.cnRenameElement);
     if (!element) {
         return;
@@ -134,6 +141,20 @@ Explorer.prototype.rewind = function(name) {
     var nodes = document.querySelectorAll('[value*="'+old.value+'"]');
     for (i = 0, max = nodes.length; i < max; i++) {
         nodes[i].value = nodes[i].value.replace(old.value, name);
+    }
+
+    if (url) {
+        var tr = element.findParent('tr');
+        if (tr) {
+            var td = tr.querySelector('td.url');
+            if (td) {
+                var a = td.querySelector('a');
+                if (a) {
+                    a.href = url;
+                    a.innerHTML = url;
+                }
+            }
+        }
     }
 };
 
@@ -218,6 +239,10 @@ Explorer.prototype.init = function(event) {
     var cells = document.querySelectorAll('.with-icon');
     for (i = 0, max = cells.length; i < max; i++) {
         element = cells[i].querySelector('a, span');
+        if (element.classList.contains('unrenamable')) {
+            element.draggable = false;
+            continue;
+        }
         element.draggable = true;
         element.addEventListener('dragstart', this.listener, false);
         element.addEventListener('dragend', this.listener, false);
