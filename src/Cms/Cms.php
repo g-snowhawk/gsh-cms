@@ -247,7 +247,9 @@ class Cms extends User implements PackageInterface
 
         $revoke_owner = [
             'system',
+            'log.read',
             'cms.site.create',
+            'cms.site.update',
             'cms.site.remove',
             'cms.site.noroot',
         ];
@@ -255,7 +257,7 @@ class Cms extends User implements PackageInterface
             $priv = parent::getPrivilege($key, $filter1, $filter2);
 
             if (false === $priv) {
-                $priv = '0';
+                $priv = '1';
             }
 
             return ($priv !== '0');
