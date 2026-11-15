@@ -3,5 +3,6 @@
   {% if url is empty %}
     {% set url = apps.dataFromDb('url', 'site', 'id = ?', [session.current_site]) %}
   {% endif %}
+  {% set url = apps.urlForDeveloper(url) %}
   <li><a href="{{ url }}" target="_brank" class="open-the-site">サイトを開く</a></li>
 {% endif %}
